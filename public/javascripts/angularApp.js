@@ -39,7 +39,7 @@ app.config([
 
 app.factory('posts', ['$http', function ($http) {
 	var o = {
-		posts: [{title: 'Hello', link: '', upvotes: 2}]
+		posts: []
 	};
 	// Method to get all posts
 	o.getAll = function () {
@@ -63,6 +63,16 @@ app.factory('posts', ['$http', function ($http) {
 	o.get = function (id) {
 		return $http.get('/posts/' + id).then(function (res) {
 			return res.data;
+		});
+	};
+	// Method to add a comment
+	o.addComment = function (id, comment) {
+		return $http.post('/posts/' + id + '/comments', comment);
+	};
+	// Method to upvote a comment
+	o.upvoteComment = function (post, comment) {
+		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote').success(function (data) {
+			comment.upvotes += 1;
 		});
 	};
 	return o;
@@ -101,12 +111,17 @@ app.controller('PostsCtrl', [
 		
 		$scope.addComment = function () {
 			if ($scope.body === '') { return; }
-			$scope.post.comments.push({
+			posts.addComment(post._id, {
 				body: $scope.body,
-				author: 'user',
-				upvotes: 0
+				author: 'user'
+			}).success(function (comment) {
+				$scope.post.comments.push(comment);
 			});
 			$scope.body = '';
+		};
+		
+		$scope.incrementUpvotes = function (comment) {
+			post.upvoteComment(post, comment);
 		};
 	}
 ]);
