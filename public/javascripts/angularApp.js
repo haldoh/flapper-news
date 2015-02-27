@@ -1,4 +1,5 @@
 /*jslint node: true */
+/*jslint nomen: true */
 /*global angular */
 "use strict";
 
@@ -13,12 +14,22 @@ app.config([
 			.state('home', {
 				url: '/home',
 				templateUrl: '/home.html',
-				controller: 'MainCtrl'
+				controller: 'MainCtrl',
+				resolve: {
+					postPromise: ['posts', function (posts) {
+						return posts.getAll();
+					}]
+				}
 			})
 			.state('posts', {
 				url: '/posts/{id}',
 				templateUrl: '/posts.html',
-				controller: 'PostsCtrl'
+				controller: 'PostsCtrl',
+				resolve: {
+					post: ['$stateParams', 'posts', function ($stateParams, posts) {
+						return posts.get($stateParams.id);
+					}]
+				}
 			});
 	
 		$urlRouterProvider.otherwise('home');
@@ -26,9 +37,33 @@ app.config([
 	}
 ]);
 
-app.factory('posts', [function () {
+app.factory('posts', ['$http', function ($http) {
 	var o = {
 		posts: [{title: 'Hello', link: '', upvotes: 2}]
+	};
+	// Method to get all posts
+	o.getAll = function () {
+		return $http.get('/posts').success(function (data) {
+			angular.copy(data, o.posts);
+		});
+	};
+	// Method to create new posts
+	o.create = function (post) {
+		return $http.post('/posts', post).success(function (data) {
+			o.posts.push(data);
+		});
+	};
+	// Method to upvote posts
+	o.upvote = function (post) {
+		return $http.put('/posts/' + post._id + '/upvote').success(function (data) {
+			post.upvotes += 1;
+		});
+	};
+	// Method to retrieve a single post
+	o.get = function (id) {
+		return $http.get('/posts/' + id).then(function (res) {
+			return res.data;
+		});
 	};
 	return o;
 }]);
@@ -42,32 +77,27 @@ app.controller('MainCtrl', [
 
 		$scope.addPost = function () {
 			if (!$scope.title || $scope.title === '') { return; }
-			$scope.posts.push({
+			posts.create({
 				title: $scope.title,
-				link: $scope.link,
-				upvotes: 0,
-				comments: [
-					{author: 'Joe', body: 'Cool post!', upvotes: 0},
-					{author: 'Bob', body: 'Great idea all wrong!', upvotes: 0}
-				]
+				link: $scope.link
 			});
 			$scope.title = '';
 			$scope.link = '';
 		};
 	
 		$scope.incrementUpvotes = function (post) {
-			post.upvotes += 1;
+			posts.upvote(post);
 		};
 	}
 ]);
 
 app.controller('PostsCtrl', [
 	'$scope',
-	'$stateParams',
 	'posts',
-	function ($scope, $stateParams, posts) {
+	'post',
+	function ($scope, posts, post) {
 		
-		$scope.post = posts.posts[$stateParams.id];
+		$scope.post = post;
 		
 		$scope.addComment = function () {
 			if ($scope.body === '') { return; }
