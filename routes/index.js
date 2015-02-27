@@ -38,6 +38,15 @@ router.post('/posts', function (req, res, next) {
 	});
 });
 
+/* PUT upvotes a post */
+router.put('/posts/:post/upvote', function (req, res, next) {
+	// Upvote the post
+	req.post.upvote(function (err, post) {
+		if (err) { return next(err); }
+		res.json(post);
+	});
+});
+
 /* PARAM post */
 router.param('post', function (req, res, next, id) {
 	// Find post by id
