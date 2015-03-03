@@ -113,7 +113,7 @@ app.controller('MainCtrl', [
 			});
 			$scope.title = '';
 			$scope.link = '';
-			$scope.postForm = false;
+			$scope.hideForm();
 		};
 		// Upvote
 		$scope.incrementUpvotes = function (post) {
@@ -152,7 +152,7 @@ app.controller('PostsCtrl', [
 			});
 			$scope.body = '';
 			$scope.author = '';
-			$scope.commentForm = false;
+			$scope.hideForm();
 		};
 		// Upvote comment
 		$scope.incrementUpvotes = function (comment) {
