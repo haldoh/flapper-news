@@ -59,6 +59,12 @@ app.factory('posts', ['$http', function ($http) {
 			post.upvotes += 1;
 		});
 	};
+	// Method to downvote posts
+	o.downvote = function (post) {
+		return $http.put('/posts/' + post._id + '/downvote').success(function (data) {
+			post.downvotes += 1;
+		});
+	};
 	// Method to retrieve a single post
 	o.get = function (id) {
 		return $http.get('/posts/' + id).then(function (res) {
@@ -73,6 +79,12 @@ app.factory('posts', ['$http', function ($http) {
 	o.upvoteComment = function (post, comment) {
 		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/upvote').success(function (data) {
 			comment.upvotes += 1;
+		});
+	};
+	// Method to downvote a comment
+	o.downvoteComment = function (post, comment) {
+		return $http.put('/posts/' + post._id + '/comments/' + comment._id + '/downvote').success(function (data) {
+			comment.downvotes += 1;
 		});
 	};
 	return o;
@@ -98,6 +110,10 @@ app.controller('MainCtrl', [
 		$scope.incrementUpvotes = function (post) {
 			posts.upvote(post);
 		};
+		
+		$scope.incrementDownvotes = function (post) {
+			posts.downvote(post);
+		};
 	}
 ]);
 
@@ -121,7 +137,11 @@ app.controller('PostsCtrl', [
 		};
 		
 		$scope.incrementUpvotes = function (comment) {
-			post.upvoteComment(post, comment);
+			posts.upvoteComment(post, comment);
+		};
+		
+		$scope.incrementDownvotes = function (comment) {
+			posts.downvoteComment(post, comment);
 		};
 	}
 ]);

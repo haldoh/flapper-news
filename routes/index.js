@@ -50,6 +50,15 @@ router.put('/posts/:post/upvote', function (req, res, next) {
 	});
 });
 
+/* PUT downvotes a post */
+router.put('/posts/:post/downvote', function (req, res, next) {
+	// Upvote the post
+	req.post.downvote(function (err, post) {
+		if (err) { return next(err); }
+		res.json(post);
+	});
+});
+
 /* POST comment a post */
 router.post('/posts/:post/comments', function (req, res, next) {
 	// New comment, get content and belonging post from req
@@ -71,6 +80,15 @@ router.post('/posts/:post/comments', function (req, res, next) {
 router.put('/posts/:post/comments/:comment/upvote', function (req, res, next) {
 	// Upvote the comment
 	req.comment.upvote(function (err, comment) {
+		if (err) { return next(err); }
+		res.json(comment);
+	});
+});
+
+/* PUT downvotes a comment */
+router.put('/posts/:post/comments/:comment/downvote', function (req, res, next) {
+	// Upvote the comment
+	req.comment.downvote(function (err, comment) {
 		if (err) { return next(err); }
 		res.json(comment);
 	});
