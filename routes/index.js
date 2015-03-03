@@ -26,8 +26,8 @@ router.get('/posts', function (req, res, next) {
 router.get('/posts/:post', function (req, res, next) {
 	req.post.populate('comments', function (err, post) {
 		if (err) { return next(err); }
+		res.json(req.post);
 	});
-	res.json(req.post);
 });
 
 /* POST save a post */
