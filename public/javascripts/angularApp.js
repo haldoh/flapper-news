@@ -94,9 +94,17 @@ app.controller('MainCtrl', [
 	'$scope',
 	'posts',
 	function ($scope, posts) {
-
+		/* Hide/show new post form */
+		$scope.postForm = false;
+		$scope.showForm = function () {
+			$scope.postForm = true;
+		};
+		$scope.hideForm = function () {
+			$scope.postForm = false;
+		};
+		/* Posts mechanics */
 		$scope.posts = posts.posts;
-
+		// New post
 		$scope.addPost = function () {
 			if (!$scope.title || $scope.title === '') { return; }
 			posts.create({
@@ -106,11 +114,11 @@ app.controller('MainCtrl', [
 			$scope.title = '';
 			$scope.link = '';
 		};
-	
+		// Upvote
 		$scope.incrementUpvotes = function (post) {
 			posts.upvote(post);
 		};
-		
+		// Downvote
 		$scope.incrementDownvotes = function (post) {
 			posts.downvote(post);
 		};
@@ -122,9 +130,17 @@ app.controller('PostsCtrl', [
 	'posts',
 	'post',
 	function ($scope, posts, post) {
-		
+		/* Hide/show new post form */
+		$scope.commentForm = false;
+		$scope.showForm = function () {
+			$scope.commentForm = true;
+		};
+		$scope.hideForm = function () {
+			$scope.commentForm = false;
+		};
+		/* Comments */
 		$scope.post = post;
-		
+		// New comment
 		$scope.addComment = function () {
 			if ($scope.body === '') { return; }
 			posts.addComment(post._id, {
@@ -135,11 +151,11 @@ app.controller('PostsCtrl', [
 			});
 			$scope.body = '';
 		};
-		
+		// Upvote comment
 		$scope.incrementUpvotes = function (comment) {
 			posts.upvoteComment(post, comment);
 		};
-		
+		// Downvote comment
 		$scope.incrementDownvotes = function (comment) {
 			posts.downvoteComment(post, comment);
 		};
